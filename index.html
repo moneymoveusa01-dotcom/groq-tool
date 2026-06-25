@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PromptKit India — AI Prompts for Your Business</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: #0d1117;
+    color: #e6edf3;
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+
+  .hero {
+    padding: 56px 24px 32px;
+    text-align: center;
+    max-width: 680px;
+    margin: 0 auto;
+  }
+
+  .badge {
+    display: inline-block;
+    background: rgba(0,212,170,0.12);
+    color: #00d4aa;
+    border: 1px solid rgba(0,212,170,0.25);
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    padding: 4px 14px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+
+  h1 {
+    font-size: clamp(26px, 5vw, 40px);
+    font-weight: 800;
+    line-height: 1.15;
+    margin-bottom: 12px;
+  }
+
+  h1 span { color: #00d4aa; }
+
+  .hero-sub {
+    font-size: 15px;
+    color: #7d8590;
+    max-width: 460px;
+    margin: 0 auto 36px;
+  }
+
+  .card {
+    background: #161b22;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    padding: 28px;
+    max-width: 680px;
+    margin: 0 auto 20px;
+  }
+
+  .grid2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+
+  @media(max-width: 500px) { .grid2 { grid-template-columns: 1fr; } }
+
+  label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: #7d8590;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 6px;
+  }
+
+  input, select {
+    width: 100%;
+    background: #0d1117;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px;
+    color: #e6edf3;
+    font-size: 14px;
+    padding: 11px 14px;
+    outline: none;
+    transition: border-color 0.2s;
+    font-family: inherit;
+  }
+
+  input:focus, select:focus { border-color: #00d4aa; }
+  input::placeholder { color: #7d8590; }
+  select option { background: #1f2937; }
+
+  .chip-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #7d8590;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 10px;
+    display: block;
+  }
+
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  .chip {
+    background: #1f2937;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+    color: #7d8590;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 7px 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .chip:hover { border-color: #00d4aa; color: #00d4aa; }
+  .chip.active {
+    background: rgba(0,212,170,0.1);
+    border-color: #00d4aa;
+    color: #00d4aa;
+  }
+
+  .btn {
+    width: 100%;
+    background: #00d4aa;
+    color: #0d1117;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 700;
+    padding: 14px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+
+  .btn:hover { opacity: 0.88; }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .loader {
+    text-align: center;
+    padding: 40px;
+    max-width: 680px;
+    margin: 0 auto;
+    display: none;
+  }
+
+  .dots { display: flex; gap: 8px; justify-content: center; margin-bottom: 14px; }
+
+  .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #00d4aa;
+    animation: bounce 1.2s infinite ease-in-out;
+  }
+
+  .dot:nth-child(2) { animation-delay: 0.2s; }
+  .dot:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes bounce {
+    0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+    40% { transform: scale(1); opacity: 1; }
+  }
+
+  .loader-text { color: #7d8590; font-size: 14px; }
+
+  .err {
+    background: rgba(248,81,73,0.08);
+    border: 1px solid rgba(248,81,73,0.3);
+    border-radius: 10px;
+    color: #f85149;
+    font-size: 13px;
+    padding: 12px 16px;
+    margin-bottom: 14px;
+    display: none;
+  }
+
+  #output { max-width: 680px; margin: 0 auto 48px; display: none; }
+
+  .out-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+
+  .out-title { font-size: 17px; font-weight: 700; }
+
+  .copy-all {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+    color: #7d8590;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .copy-all:hover { border-color: #00d4aa; color: #00d4aa; }
+
+  .pcard {
+    background: #161b22;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 14px;
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+
+  .phead {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 14px 18px;
+    background: #1f2937;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .pnum { font-size: 11px; font-weight: 700; color: #00d4aa; letter-spacing: 0.08em; margin-bottom: 2px; }
+  .puse { font-size: 13px; font-weight: 600; color: #e6edf3; }
+
+  .copy-one {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 6px;
+    color: #7d8590;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 10px;
+    cursor: pointer;
+    transition: all 0.15s;
+    flex-shrink: 0;
+    margin-left: 8px;
+    font-family: inherit;
+  }
+
+  .copy-one:hover { border-color: #00d4aa; color: #00d4aa; }
+
+  .pbody {
+    padding: 16px 18px;
+    font-size: 14px;
+    line-height: 1.8;
+    color: #e6edf3;
+    white-space: pre-wrap;
+  }
+
+  .ptip {
+    padding: 10px 18px 14px;
+    font-size: 12px;
+    color: #7c6ff7;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    font-style: italic;
+  }
+
+  .reset {
+    display: block;
+    margin: 16px auto 0;
+    background: none;
+    border: none;
+    color: #7d8590;
+    font-size: 13px;
+    cursor: pointer;
+    text-decoration: underline;
+    font-family: inherit;
+  }
+
+  footer {
+    text-align: center;
+    padding: 24px;
+    font-size: 12px;
+    color: #7d8590;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    margin-top: 32px;
+  }
+
+  footer span { color: #00d4aa; font-weight: 600; }
+</style>
+</head>
+<body>
+
+<section class="hero">
+  <div class="badge">Free AI Tool</div>
+  <h1>Prompts that <span>work</span><br>for your business</h1>
+  <p class="hero-sub">Apna business type batao — 5 custom, copy-paste ready AI prompts milenge seconds mein. Hindi + English. Free.</p>
+</section>
+
+<div class="card" id="formCard">
+  <div class="grid2">
+    <div>
+      <label>Business type</label>
+      <input type="text" id="biz" placeholder="e.g. restaurant, salon, gym" />
+    </div>
+    <div>
+      <label>City</label>
+      <input type="text" id="city" placeholder="e.g. Durg, Raipur" />
+    </div>
+    <div>
+      <label>Language</label>
+      <select id="lang">
+        <option value="English">English</option>
+        <option value="Hindi">Hindi</option>
+        <option value="Hinglish">Hinglish</option>
+      </select>
+    </div>
+    <div>
+      <label>Biggest challenge</label>
+      <select id="prob">
+        <option>Getting more customers</option>
+        <option>Social media content</option>
+        <option>Customer service replies</option>
+        <option>Hiring good staff</option>
+        <option>Sales and follow-ups</option>
+        <option>Billing and invoices</option>
+      </select>
+    </div>
+  </div>
+
+  <span class="chip-label">Category</span>
+  <div class="chips" id="chips">
+    <div class="chip active" data-v="Social Media">Social Media</div>
+    <div class="chip" data-v="Customer Service">Customer Service</div>
+    <div class="chip" data-v="Sales">Sales</div>
+    <div class="chip" data-v="HR & Hiring">HR & Hiring</div>
+    <div class="chip" data-v="WhatsApp Marketing">WhatsApp</div>
+    <div class="chip" data-v="Finance & Billing">Finance</div>
+  </div>
+
+  <div class="err" id="err"></div>
+  <button class="btn" id="genBtn" onclick="generate()">Generate My Prompts</button>
+</div>
+
+<div class="loader" id="loader">
+  <div class="dots">
+    <div class="dot"></div>
+    <div class="dot"></div>
+    <div class="dot"></div>
+  </div>
+  <p class="loader-text">Generating custom prompts for your business...</p>
+</div>
+
+<div id="output">
+  <div class="out-header">
+    <span class="out-title" id="outTitle"></span>
+    <button class="copy-all" onclick="copyAll()">Copy all</button>
+  </div>
+  <div id="promptList"></div>
+  <button class="reset" onclick="resetForm()">Generate new prompts</button>
+</div>
+
+<footer>
+  Powered by <span>Claude AI</span> &nbsp;·&nbsp; Made for Indian small businesses
+</footer>
+
+<script>
+  document.querySelectorAll('.chip').forEach(c => {
+    c.addEventListener('click', () => {
+      document.querySelectorAll('.chip').forEach(x => x.classList.remove('active'));
+      c.classList.add('active');
+    });
+  });
+
+  let allPrompts = [];
+
+  async function generate() {
+    const biz  = document.getElementById('biz').value.trim();
+    const city = document.getElementById('city').value.trim();
+    const lang = document.getElementById('lang').value;
+    const prob = document.getElementById('prob').value;
+    const cat  = document.querySelector('.chip.active')?.dataset.v || 'Social Media';
+    const errEl = document.getElementById('err');
+
+    errEl.style.display = 'none';
+    if (!biz) {
+      errEl.textContent = 'Please enter your business type first.';
+      errEl.style.display = 'block';
+      return;
+    }
+
+    document.getElementById('genBtn').disabled = true;
+    document.getElementById('formCard').style.display = 'none';
+    document.getElementById('loader').style.display = 'block';
+    document.getElementById('output').style.display = 'none';
+
+    try {
+      const res = await fetch('/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ biz, city, lang, prob, category: cat })
+      });
+
+      if (!res.ok) throw new Error('Server error');
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+
+      allPrompts = data.prompts;
+      renderOutput(data);
+
+    } catch(e) {
+      document.getElementById('formCard').style.display = 'block';
+      errEl.textContent = 'Kuch galat hua. Dobara try karo.';
+      errEl.style.display = 'block';
+      document.getElementById('genBtn').disabled = false;
+    }
+
+    document.getElementById('loader').style.display = 'none';
+  }
+
+  function renderOutput(data) {
+    document.getElementById('outTitle').textContent = data.title;
+    const list = document.getElementById('promptList');
+    list.innerHTML = '';
+
+    data.prompts.forEach((p, i) => {
+      const d = document.createElement('div');
+      d.className = 'pcard';
+      d.innerHTML = `
+        <div class="phead">
+          <div>
+            <div class="pnum">PROMPT ${i + 1}</div>
+            <div class="puse">${esc(p.use_case)}</div>
+          </div>
+          <button class="copy-one" onclick="copyOne(${i}, this)">Copy</button>
+        </div>
+        <div class="pbody">${esc(p.prompt)}</div>
+        <div class="ptip">${esc(p.tip)}</div>
+      `;
+      list.appendChild(d);
+    });
+
+    document.getElementById('output').style.display = 'block';
+    window.scrollTo({ top: document.getElementById('output').offsetTop - 20, behavior: 'smooth' });
+  }
+
+  function esc(s) {
+    return String(s)
+      .replace(/&/g,'&amp;')
+      .replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;');
+  }
+
+  function copyOne(i, btn) {
+    navigator.clipboard.writeText(allPrompts[i].prompt);
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = 'Copy', 2000);
+  }
+
+  function copyAll() {
+    const text = allPrompts
+      .map((p, i) => `Prompt ${i+1} — ${p.use_case}\n${p.prompt}\n\n${p.tip}`)
+      .join('\n\n---\n\n');
+    navigator.clipboard.writeText(text);
+    const btn = document.querySelector('.copy-all');
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = 'Copy all', 2000);
+  }
+
+  function resetForm() {
+    document.getElementById('output').style.display = 'none';
+    document.getElementById('formCard').style.display = 'block';
+    document.getElementById('genBtn').disabled = false;
+    allPrompts = [];
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+</script>
+</body>
+</html>
