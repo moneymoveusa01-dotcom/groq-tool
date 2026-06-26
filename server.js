@@ -1,79 +1,93 @@
 const express = require('express');
-const cors = require('cors');
+const path = require('path');
+const Groq = require('groq-sdk');
 
 const app = express();
-app.use(cors());
-app.use(express.json());
-app.use(express.static('.'));
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
-const GROQ_API_KEY = process.env.GROQ_API_KEY;
+app.use(express.json());
+app.use(express.static(path.join(__dirname)));
 
 app.post('/api/generate', async (req, res) => {
-  const { biz, city, lang, prob, category } = req.body;
+  try {
+    const { biz, city, lang, prob, category, outputTypes } = req.body;
 
-  if (!biz) {
-    return res.status(400).json({ error: 'Business type required' });
-  }
+    if (!biz) return res.status(400).json({ error: 'Business type required' });
 
-  const prompt = `You are an expert prompt engineer for Indian small businesses.
-Create 5 ready-to-use AI prompts for a ${biz} in ${city || 'India'}.
-Category: ${category || 'Social Media'}
-Language: ${lang || 'English'}
-Main problem: ${prob || 'Getting more customers'}
+    const types = (outputTypes && outputTypes.length > 0)
+      ? outputTypes
+      : ['Instagram Caption', 'WhatsApp Message', 'Google Business Post', 'Ad Copy', 'Sales Pitch'];
 
-Respond ONLY in valid JSON, no markdown, no backticks:
+    const cityStr = city ? ` in ${city}` : '';
+
+    const systemPrompt = `You are an expert Indian small business marketing AI. You generate ready-to-use content for local Indian businesses. Always write content that is practical, culturally relevant, and sounds natural for Indian audiences. Return ONLY valid JSON, no markdown, no extra text.`;
+
+    const userPrompt = `Generate business content for the following:
+- Business: ${biz}${cityStr}
+- Language: ${lang}
+- Biggest challenge: ${prob}
+- Category: ${category}
+- Content types needed: ${types.join(', ')}
+
+Generate exactly ${types.length} pieces of content — one for each content type.
+
+Return a JSON object in this exact format:
 {
-  "title": "5 ${category} prompts for your ${biz}",
+  "title": "Content for [business] ${cityStr}",
   "prompts": [
     {
-      "use_case": "3-4 word label",
-      "prompt": "Full prompt in ${lang} with [placeholders]. Min 3 sentences. Specific to a ${biz} in India. Include Indian context where relevant.",
-      "tip": "One practical tip on using this prompt. Start with Tip:"
+      "output_type": "<exact content type from the list>",
+      "use_case": "<short descriptive name, e.g. 'Festival Offer Post'>",
+      "prompt": "<the actual ready-to-use content, 3-6 sentences, in ${lang}>",
+      "tip": "<one practical tip for using this content>"
     }
   ]
-}`;
+}
 
-  try {
-    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${GROQ_API_KEY}`
-      },
-      body: JSON.stringify({
-        model: 'llama-3.3-70b-versatile',
-        max_tokens: 1500,
-        messages: [
-          {
-            role: 'system',
-            content: 'You are an expert prompt engineer for Indian small businesses. Always respond in valid JSON only.'
-          },
-          {
-            role: 'user',
-            content: prompt
-          }
-        ],
-        temperature: 0.7
-      })
+Rules:
+- prompt must be actual usable content (post text, message text), NOT a meta-prompt
+- Include relevant emojis for social content
+- Make content specific to ${biz}${cityStr}
+- For WhatsApp: keep it conversational and short
+- For Instagram: include hashtags at the end
+- For Google Post: professional tone, mention location
+- For Ad Copy: strong hook + clear call to action
+- For SEO Blog: start with an engaging intro paragraph`;
+
+    const completion = await groq.chat.completions.create({
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt }
+      ],
+      model: 'llama3-70b-8192',
+      temperature: 0.8,
+      max_tokens: 2000,
     });
 
-    const data = await response.json();
+    const raw = completion.choices[0]?.message?.content || '';
 
-    if (data.error) {
-      return res.status(500).json({ error: data.error.message });
+    // Strip markdown code fences if present
+    const cleaned = raw.replace(/```json|```/g, '').trim();
+
+    let parsed;
+    try {
+      parsed = JSON.parse(cleaned);
+    } catch (e) {
+      console.error('JSON parse failed:', cleaned.substring(0, 300));
+      return res.status(500).json({ error: 'AI response parse error. Please try again.' });
     }
 
-    let text = data.choices[0].message.content;
-    text = text.replace(/```json|```/g, '').trim();
-    const parsed = JSON.parse(text);
+    if (!parsed.prompts || !Array.isArray(parsed.prompts)) {
+      return res.status(500).json({ error: 'Invalid AI response format. Please try again.' });
+    }
 
     res.json(parsed);
 
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Something went wrong' });
+    console.error('Generate error:', err.message);
+    res.status(500).json({ error: 'Server error. Please try again.' });
   }
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`PromptKit running on port ${PORT}`));
