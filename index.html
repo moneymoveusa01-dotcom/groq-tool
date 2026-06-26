@@ -1,307 +1,434 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PromptKit India — AI Prompts for Your Business</title>
+<title>PromptKit India — AI Content for Your Business</title>
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  body {
-    font-family: 'Segoe UI', system-ui, sans-serif;
-    background: #0d1117;
-    color: #e6edf3;
-    min-height: 100vh;
-    line-height: 1.6;
-  }
+:root {
+  --green: #00d4aa;
+  --green-dim: rgba(0,212,170,0.12);
+  --green-border: rgba(0,212,170,0.25);
+  --bg: #0d1117;
+  --card: #161b22;
+  --card2: #1f2937;
+  --border: rgba(255,255,255,0.08);
+  --muted: #7d8590;
+  --text: #e6edf3;
+  --purple: #7c6ff7;
+  --red: #f85149;
+}
 
-  .hero {
-    padding: 56px 24px 32px;
-    text-align: center;
-    max-width: 680px;
-    margin: 0 auto;
-  }
+body {
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  line-height: 1.6;
+}
 
-  .badge {
-    display: inline-block;
-    background: rgba(0,212,170,0.12);
-    color: #00d4aa;
-    border: 1px solid rgba(0,212,170,0.25);
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 0.06em;
-    padding: 4px 14px;
-    text-transform: uppercase;
-    margin-bottom: 20px;
-  }
+.hero {
+  padding: 52px 24px 28px;
+  text-align: center;
+  max-width: 680px;
+  margin: 0 auto;
+}
 
-  h1 {
-    font-size: clamp(26px, 5vw, 40px);
-    font-weight: 800;
-    line-height: 1.15;
-    margin-bottom: 12px;
-  }
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--green-dim);
+  color: var(--green);
+  border: 1px solid var(--green-border);
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 4px 14px;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
 
-  h1 span { color: #00d4aa; }
+.badge-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--green);
+  animation: pulse 2s infinite;
+}
 
-  .hero-sub {
-    font-size: 15px;
-    color: #7d8590;
-    max-width: 460px;
-    margin: 0 auto 36px;
-  }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
-  .card {
-    background: #161b22;
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 16px;
-    padding: 28px;
-    max-width: 680px;
-    margin: 0 auto 20px;
-  }
+h1 {
+  font-size: clamp(28px, 5.5vw, 44px);
+  font-weight: 800;
+  line-height: 1.12;
+  margin-bottom: 14px;
+}
+h1 span { color: var(--green); }
 
-  .grid2 {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 14px;
-    margin-bottom: 14px;
-  }
+.hero-sub {
+  font-size: 15px;
+  color: var(--muted);
+  max-width: 460px;
+  margin: 0 auto 14px;
+}
 
-  @media(max-width: 500px) { .grid2 { grid-template-columns: 1fr; } }
+.usage-bar {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 6px 16px;
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
 
-  label {
-    display: block;
-    font-size: 12px;
-    font-weight: 600;
-    color: #7d8590;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    margin-bottom: 6px;
-  }
+.usage-count { color: var(--green); font-weight: 700; }
+.usage-pro { color: var(--green); font-weight: 600; cursor: pointer; text-decoration: underline; margin-left: 4px; }
 
-  input, select {
-    width: 100%;
-    background: #0d1117;
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 10px;
-    color: #e6edf3;
-    font-size: 14px;
-    padding: 11px 14px;
-    outline: none;
-    transition: border-color 0.2s;
-    font-family: inherit;
-  }
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 28px;
+  max-width: 680px;
+  margin: 0 auto 20px;
+}
 
-  input:focus, select:focus { border-color: #00d4aa; }
-  input::placeholder { color: #7d8590; }
-  select option { background: #1f2937; }
+.grid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+@media(max-width: 520px) { .grid2 { grid-template-columns: 1fr; } }
 
-  .chip-label {
-    font-size: 12px;
-    font-weight: 600;
-    color: #7d8590;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    margin-bottom: 10px;
-    display: block;
-  }
+label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin-bottom: 6px;
+}
 
-  .chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 20px;
-  }
+input, select {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font-size: 14px;
+  padding: 11px 14px;
+  outline: none;
+  transition: border-color 0.2s;
+  font-family: inherit;
+}
+input:focus, select:focus { border-color: var(--green); }
+input::placeholder { color: var(--muted); }
+select option { background: #1f2937; }
 
-  .chip {
-    background: #1f2937;
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 8px;
-    color: #7d8590;
-    font-size: 13px;
-    font-weight: 500;
-    padding: 7px 14px;
-    cursor: pointer;
-    transition: all 0.15s;
-  }
+.section-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin-bottom: 10px;
+  display: block;
+}
 
-  .chip:hover { border-color: #00d4aa; color: #00d4aa; }
-  .chip.active {
-    background: rgba(0,212,170,0.1);
-    border-color: #00d4aa;
-    color: #00d4aa;
-  }
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
 
-  .btn {
-    width: 100%;
-    background: #00d4aa;
-    color: #0d1117;
-    border: none;
-    border-radius: 10px;
-    font-size: 15px;
-    font-weight: 700;
-    padding: 14px;
-    cursor: pointer;
-    transition: opacity 0.2s;
-  }
+.chip {
+  background: var(--card2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 7px 14px;
+  cursor: pointer;
+  transition: all 0.15s;
+  user-select: none;
+}
+.chip:hover { border-color: var(--green); color: var(--green); }
+.chip.active { background: var(--green-dim); border-color: var(--green); color: var(--green); }
 
-  .btn:hover { opacity: 0.88; }
-  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.out-types {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 22px;
+}
 
-  .loader {
-    text-align: center;
-    padding: 40px;
-    max-width: 680px;
-    margin: 0 auto;
-    display: none;
-  }
+.otype {
+  background: var(--card2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 13px;
+  cursor: pointer;
+  transition: all 0.15s;
+  user-select: none;
+}
+.otype:hover { border-color: var(--purple); color: var(--purple); }
+.otype.active { background: rgba(124,111,247,0.1); border-color: var(--purple); color: var(--purple); }
 
-  .dots { display: flex; gap: 8px; justify-content: center; margin-bottom: 14px; }
+.btn {
+  width: 100%;
+  background: var(--green);
+  color: var(--bg);
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 700;
+  padding: 14px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  font-family: inherit;
+}
+.btn:hover { opacity: 0.88; }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-  .dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    background: #00d4aa;
-    animation: bounce 1.2s infinite ease-in-out;
-  }
+.loader {
+  text-align: center;
+  padding: 56px 24px;
+  max-width: 680px;
+  margin: 0 auto;
+  display: none;
+}
 
-  .dot:nth-child(2) { animation-delay: 0.2s; }
-  .dot:nth-child(3) { animation-delay: 0.4s; }
+.dots { display: flex; gap: 8px; justify-content: center; margin-bottom: 14px; }
+.dot {
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  background: var(--green);
+  animation: bounce 1.2s infinite ease-in-out;
+}
+.dot:nth-child(2) { animation-delay: 0.2s; }
+.dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes bounce { 0%,80%,100%{transform:scale(0.6);opacity:0.4} 40%{transform:scale(1);opacity:1} }
+.loader-text { color: var(--muted); font-size: 14px; }
 
-  @keyframes bounce {
-    0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
-    40% { transform: scale(1); opacity: 1; }
-  }
+.err {
+  background: rgba(248,81,73,0.08);
+  border: 1px solid rgba(248,81,73,0.3);
+  border-radius: 10px;
+  color: var(--red);
+  font-size: 13px;
+  padding: 12px 16px;
+  margin-bottom: 14px;
+  display: none;
+}
 
-  .loader-text { color: #7d8590; font-size: 14px; }
+#output { max-width: 680px; margin: 0 auto 48px; display: none; }
 
-  .err {
-    background: rgba(248,81,73,0.08);
-    border: 1px solid rgba(248,81,73,0.3);
-    border-radius: 10px;
-    color: #f85149;
-    font-size: 13px;
-    padding: 12px 16px;
-    margin-bottom: 14px;
-    display: none;
-  }
+.out-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  gap: 10px;
+}
+.out-title { font-size: 16px; font-weight: 700; }
 
-  #output { max-width: 680px; margin: 0 auto 48px; display: none; }
+.copy-all {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 14px;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+  white-space: nowrap;
+}
+.copy-all:hover { border-color: var(--green); color: var(--green); }
 
-  .out-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 16px;
-  }
+.tab-bar {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
 
-  .out-title { font-size: 17px; font-weight: 700; }
+.tab-btn {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+.tab-btn.active { background: var(--green-dim); border-color: var(--green); color: var(--green); }
 
-  .copy-all {
-    background: transparent;
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 8px;
-    color: #7d8590;
-    font-size: 12px;
-    font-weight: 600;
-    padding: 6px 14px;
-    cursor: pointer;
-    transition: all 0.15s;
-  }
+.pcard {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  margin-bottom: 12px;
+  overflow: hidden;
+  animation: fadeUp 0.3s ease both;
+}
+@keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
 
-  .copy-all:hover { border-color: #00d4aa; color: #00d4aa; }
+.phead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 14px 18px;
+  background: var(--card2);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  gap: 10px;
+}
 
-  .pcard {
-    background: #161b22;
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 14px;
-    margin-bottom: 12px;
-    overflow: hidden;
-  }
+.phead-left { flex: 1; }
+.pnum { font-size: 11px; font-weight: 700; color: var(--green); letter-spacing: 0.08em; margin-bottom: 2px; }
+.puse { font-size: 13px; font-weight: 600; color: var(--text); }
 
-  .phead {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    padding: 14px 18px;
-    background: #1f2937;
-    border-bottom: 1px solid rgba(255,255,255,0.06);
-  }
+.ptype-tag {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--purple);
+  background: rgba(124,111,247,0.1);
+  border: 1px solid rgba(124,111,247,0.2);
+  border-radius: 5px;
+  padding: 2px 8px;
+  margin-top: 5px;
+  display: inline-block;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
 
-  .pnum { font-size: 11px; font-weight: 700; color: #00d4aa; letter-spacing: 0.08em; margin-bottom: 2px; }
-  .puse { font-size: 13px; font-weight: 600; color: #e6edf3; }
+.copy-one {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  cursor: pointer;
+  transition: all 0.15s;
+  flex-shrink: 0;
+  font-family: inherit;
+}
+.copy-one:hover { border-color: var(--green); color: var(--green); }
 
-  .copy-one {
-    background: transparent;
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 6px;
-    color: #7d8590;
-    font-size: 11px;
-    font-weight: 600;
-    padding: 4px 10px;
-    cursor: pointer;
-    transition: all 0.15s;
-    flex-shrink: 0;
-    margin-left: 8px;
-    font-family: inherit;
-  }
+.pbody {
+  padding: 16px 18px;
+  font-size: 14px;
+  line-height: 1.85;
+  color: var(--text);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
 
-  .copy-one:hover { border-color: #00d4aa; color: #00d4aa; }
+.ptip {
+  padding: 10px 18px 14px;
+  font-size: 12px;
+  color: var(--purple);
+  border-top: 1px solid rgba(255,255,255,0.06);
+  font-style: italic;
+  line-height: 1.6;
+}
 
-  .pbody {
-    padding: 16px 18px;
-    font-size: 14px;
-    line-height: 1.8;
-    color: #e6edf3;
-    white-space: pre-wrap;
-  }
+.pro-banner {
+  background: linear-gradient(135deg, rgba(0,212,170,0.07), rgba(124,111,247,0.07));
+  border: 1px solid var(--green-border);
+  border-radius: 14px;
+  padding: 18px 20px;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.pro-text strong { display: block; font-size: 14px; font-weight: 700; margin-bottom: 3px; }
+.pro-text span { font-size: 12px; color: var(--muted); }
+.pro-btn {
+  background: var(--green);
+  color: var(--bg);
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 9px 18px;
+  cursor: pointer;
+  white-space: nowrap;
+  font-family: inherit;
+  flex-shrink: 0;
+}
 
-  .ptip {
-    padding: 10px 18px 14px;
-    font-size: 12px;
-    color: #7c6ff7;
-    border-top: 1px solid rgba(255,255,255,0.06);
-    font-style: italic;
-  }
+.reset {
+  display: block;
+  margin: 14px auto 0;
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 13px;
+  cursor: pointer;
+  text-decoration: underline;
+  font-family: inherit;
+}
 
-  .reset {
-    display: block;
-    margin: 16px auto 0;
-    background: none;
-    border: none;
-    color: #7d8590;
-    font-size: 13px;
-    cursor: pointer;
-    text-decoration: underline;
-    font-family: inherit;
-  }
-
-  footer {
-    text-align: center;
-    padding: 24px;
-    font-size: 12px;
-    color: #7d8590;
-    border-top: 1px solid rgba(255,255,255,0.06);
-    margin-top: 32px;
-  }
-
-  footer span { color: #00d4aa; font-weight: 600; }
+footer {
+  text-align: center;
+  padding: 24px;
+  font-size: 12px;
+  color: var(--muted);
+  border-top: 1px solid var(--border);
+  margin-top: 24px;
+}
+footer span { color: var(--green); font-weight: 600; }
 </style>
 </head>
 <body>
 
 <section class="hero">
-  <div class="badge">Free AI Tool</div>
-  <h1>Prompts that <span>work</span><br>for your business</h1>
-  <p class="hero-sub">Apna business type batao — 5 custom, copy-paste ready AI prompts milenge seconds mein. Hindi + English. Free.</p>
+  <div class="badge">
+    <div class="badge-dot"></div>
+    Free AI Tool
+  </div>
+  <h1>Content that <span>sells</span><br>for your business</h1>
+  <p class="hero-sub">Business type batao — Instagram captions, WhatsApp messages, Google posts aur ads milenge seconds mein. Hindi + English. Free.</p>
+  <div class="usage-bar">
+    🎯 Free uses today: <span class="usage-count" id="usageCount">3</span>/3
+    &nbsp;·&nbsp;
+    <span class="usage-pro" onclick="showProModal()">Pro ₹199/mo →</span>
+  </div>
 </section>
 
 <div class="card" id="formCard">
   <div class="grid2">
     <div>
-      <label>Business type</label>
-      <input type="text" id="biz" placeholder="e.g. restaurant, salon, gym" />
+      <label>Business Type</label>
+      <input type="text" id="biz" placeholder="e.g. salon, gym, restaurant" />
     </div>
     <div>
       <label>City</label>
@@ -316,7 +443,7 @@
       </select>
     </div>
     <div>
-      <label>Biggest challenge</label>
+      <label>Biggest Challenge</label>
       <select id="prob">
         <option>Getting more customers</option>
         <option>Social media content</option>
@@ -328,36 +455,52 @@
     </div>
   </div>
 
-  <span class="chip-label">Category</span>
+  <span class="section-label">Category</span>
   <div class="chips" id="chips">
-    <div class="chip active" data-v="Social Media">Social Media</div>
-    <div class="chip" data-v="Customer Service">Customer Service</div>
-    <div class="chip" data-v="Sales">Sales</div>
-    <div class="chip" data-v="HR & Hiring">HR & Hiring</div>
-    <div class="chip" data-v="WhatsApp Marketing">WhatsApp</div>
-    <div class="chip" data-v="Finance & Billing">Finance</div>
+    <div class="chip active" data-v="Social Media">📱 Social Media</div>
+    <div class="chip" data-v="Customer Service">💬 Customer Service</div>
+    <div class="chip" data-v="Sales">💰 Sales</div>
+    <div class="chip" data-v="HR & Hiring">👥 HR & Hiring</div>
+    <div class="chip" data-v="WhatsApp Marketing">📣 WhatsApp</div>
+    <div class="chip" data-v="Finance & Billing">🧾 Finance</div>
+  </div>
+
+  <span class="section-label">Generate Content For</span>
+  <div class="out-types" id="outTypes">
+    <div class="otype active" data-v="Instagram Caption">📸 Instagram Caption</div>
+    <div class="otype active" data-v="WhatsApp Message">💬 WhatsApp Message</div>
+    <div class="otype active" data-v="Google Business Post">🗺️ Google Post</div>
+    <div class="otype" data-v="Facebook Post">👍 Facebook Post</div>
+    <div class="otype" data-v="Ad Copy">🎯 Ad Copy</div>
+    <div class="otype" data-v="SEO Blog Intro">✍️ SEO Blog</div>
   </div>
 
   <div class="err" id="err"></div>
-  <button class="btn" id="genBtn" onclick="generate()">Generate My Prompts</button>
+  <button class="btn" id="genBtn" onclick="generate()">✨ Generate My Content</button>
 </div>
 
 <div class="loader" id="loader">
   <div class="dots">
-    <div class="dot"></div>
-    <div class="dot"></div>
-    <div class="dot"></div>
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div>
   </div>
-  <p class="loader-text">Generating custom prompts for your business...</p>
+  <p class="loader-text">Generating content for your business...</p>
 </div>
 
 <div id="output">
   <div class="out-header">
     <span class="out-title" id="outTitle"></span>
-    <button class="copy-all" onclick="copyAll()">Copy all</button>
+    <button class="copy-all" onclick="copyAll()">📋 Copy All</button>
   </div>
+  <div class="tab-bar" id="tabBar"></div>
   <div id="promptList"></div>
-  <button class="reset" onclick="resetForm()">Generate new prompts</button>
+  <div class="pro-banner">
+    <div class="pro-text">
+      <strong>🚀 Unlimited content — ₹199/month</strong>
+      <span>No daily limit · All content types · Save history · PDF export</span>
+    </div>
+    <button class="pro-btn" onclick="showProModal()">Upgrade to Pro</button>
+  </div>
+  <button class="reset" onclick="resetForm()">↩ Generate new content</button>
 </div>
 
 <footer>
@@ -365,115 +508,209 @@
 </footer>
 
 <script>
-  document.querySelectorAll('.chip').forEach(c => {
-    c.addEventListener('click', () => {
-      document.querySelectorAll('.chip').forEach(x => x.classList.remove('active'));
-      c.classList.add('active');
+// ── Usage (localStorage) ──
+const FREE_LIMIT = 3;
+const TODAY = new Date().toDateString();
+
+function getUsage() {
+  try {
+    const s = JSON.parse(localStorage.getItem('pk_usage') || '{}');
+    if (s.date !== TODAY) return { date: TODAY, count: 0 };
+    return s;
+  } catch(e) { return { date: TODAY, count: 0 }; }
+}
+
+function incrementUsage() {
+  const u = getUsage();
+  u.count++;
+  localStorage.setItem('pk_usage', JSON.stringify(u));
+  updateUsageUI();
+}
+
+function updateUsageUI() {
+  const u = getUsage();
+  const left = Math.max(0, FREE_LIMIT - u.count);
+  document.getElementById('usageCount').textContent = left;
+}
+
+updateUsageUI();
+
+// ── Chips: category (single) ──
+document.querySelectorAll('.chip').forEach(c => {
+  c.addEventListener('click', () => {
+    document.querySelectorAll('.chip').forEach(x => x.classList.remove('active'));
+    c.classList.add('active');
+  });
+});
+
+// ── Output types (multi) ──
+document.querySelectorAll('.otype').forEach(o => {
+  o.addEventListener('click', () => {
+    o.classList.toggle('active');
+    // keep at least 1
+    if (!document.querySelector('.otype.active')) o.classList.add('active');
+  });
+});
+
+// ── State ──
+let allPrompts = [];
+let activeTab = 'All';
+
+// ── Generate ──
+async function generate() {
+  const u = getUsage();
+  if (u.count >= FREE_LIMIT) {
+    showProModal();
+    return;
+  }
+
+  const biz = document.getElementById('biz').value.trim();
+  const city = document.getElementById('city').value.trim();
+  const lang = document.getElementById('lang').value;
+  const prob = document.getElementById('prob').value;
+  const cat = document.querySelector('.chip.active')?.dataset.v || 'Social Media';
+  const outputTypes = [...document.querySelectorAll('.otype.active')].map(o => o.dataset.v);
+
+  const errEl = document.getElementById('err');
+  errEl.style.display = 'none';
+
+  if (!biz) {
+    errEl.textContent = 'Business type daalna zaroori hai.';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  document.getElementById('genBtn').disabled = true;
+  document.getElementById('formCard').style.display = 'none';
+  document.getElementById('loader').style.display = 'block';
+  document.getElementById('output').style.display = 'none';
+
+  try {
+    const res = await fetch('/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ biz, city, lang, prob, category: cat, outputTypes })
     });
+
+    const data = await res.json();
+
+    if (!res.ok || data.error) {
+      throw new Error(data.error || 'Server error');
+    }
+
+    allPrompts = data.prompts || [];
+    if (allPrompts.length === 0) throw new Error('No content generated');
+
+    incrementUsage();
+    renderOutput(data, outputTypes);
+
+  } catch(e) {
+    console.error(e);
+    document.getElementById('formCard').style.display = 'block';
+    errEl.textContent = e.message || 'Kuch galat hua. Dobara try karo.';
+    errEl.style.display = 'block';
+    document.getElementById('genBtn').disabled = false;
+  }
+
+  document.getElementById('loader').style.display = 'none';
+}
+
+// ── Render ──
+function renderOutput(data, outputTypes) {
+  const biz = document.getElementById('biz').value.trim();
+  document.getElementById('outTitle').textContent =
+    data.title || `Content for ${biz}`;
+
+  // Tabs
+  const tabBar = document.getElementById('tabBar');
+  tabBar.innerHTML = '';
+  activeTab = 'All';
+
+  const tabs = ['All', ...new Set(allPrompts.map(p => p.output_type).filter(Boolean))];
+  tabs.forEach(t => {
+    const btn = document.createElement('button');
+    btn.className = 'tab-btn' + (t === 'All' ? ' active' : '');
+    btn.textContent = t;
+    btn.onclick = () => switchTab(t);
+    tabBar.appendChild(btn);
   });
 
-  let allPrompts = [];
+  renderPrompts();
+  document.getElementById('output').style.display = 'block';
+  window.scrollTo({ top: document.getElementById('output').offsetTop - 20, behavior: 'smooth' });
+}
 
-  async function generate() {
-    const biz  = document.getElementById('biz').value.trim();
-    const city = document.getElementById('city').value.trim();
-    const lang = document.getElementById('lang').value;
-    const prob = document.getElementById('prob').value;
-    const cat  = document.querySelector('.chip.active')?.dataset.v || 'Social Media';
-    const errEl = document.getElementById('err');
+function switchTab(tab) {
+  activeTab = tab;
+  document.querySelectorAll('.tab-btn').forEach(b => {
+    b.classList.toggle('active', b.textContent === tab);
+  });
+  renderPrompts();
+}
 
-    errEl.style.display = 'none';
-    if (!biz) {
-      errEl.textContent = 'Please enter your business type first.';
-      errEl.style.display = 'block';
-      return;
-    }
+function renderPrompts() {
+  const list = document.getElementById('promptList');
+  list.innerHTML = '';
 
-    document.getElementById('genBtn').disabled = true;
-    document.getElementById('formCard').style.display = 'none';
-    document.getElementById('loader').style.display = 'block';
-    document.getElementById('output').style.display = 'none';
+  const filtered = activeTab === 'All'
+    ? allPrompts
+    : allPrompts.filter(p => p.output_type === activeTab);
 
-    try {
-      const res = await fetch('/api/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ biz, city, lang, prob, category: cat })
-      });
-
-      if (!res.ok) throw new Error('Server error');
-      const data = await res.json();
-      if (data.error) throw new Error(data.error);
-
-      allPrompts = data.prompts;
-      renderOutput(data);
-
-    } catch(e) {
-      document.getElementById('formCard').style.display = 'block';
-      errEl.textContent = 'Kuch galat hua. Dobara try karo.';
-      errEl.style.display = 'block';
-      document.getElementById('genBtn').disabled = false;
-    }
-
-    document.getElementById('loader').style.display = 'none';
-  }
-
-  function renderOutput(data) {
-    document.getElementById('outTitle').textContent = data.title;
-    const list = document.getElementById('promptList');
-    list.innerHTML = '';
-
-    data.prompts.forEach((p, i) => {
-      const d = document.createElement('div');
-      d.className = 'pcard';
-      d.innerHTML = `
-        <div class="phead">
-          <div>
-            <div class="pnum">PROMPT ${i + 1}</div>
-            <div class="puse">${esc(p.use_case)}</div>
-          </div>
-          <button class="copy-one" onclick="copyOne(${i}, this)">Copy</button>
+  filtered.forEach((p, i) => {
+    const globalIdx = allPrompts.indexOf(p);
+    const d = document.createElement('div');
+    d.className = 'pcard';
+    d.style.animationDelay = `${i * 0.06}s`;
+    d.innerHTML = `
+      <div class="phead">
+        <div class="phead-left">
+          <div class="pnum">CONTENT ${i + 1}</div>
+          <div class="puse">${esc(p.use_case || '')}</div>
+          ${p.output_type ? `<div class="ptype-tag">${esc(p.output_type)}</div>` : ''}
         </div>
-        <div class="pbody">${esc(p.prompt)}</div>
-        <div class="ptip">${esc(p.tip)}</div>
-      `;
-      list.appendChild(d);
-    });
+        <button class="copy-one" onclick="copyOne(${globalIdx}, this)">Copy</button>
+      </div>
+      <div class="pbody">${esc(p.prompt || '')}</div>
+      ${p.tip ? `<div class="ptip">💡 ${esc(p.tip)}</div>` : ''}
+    `;
+    list.appendChild(d);
+  });
+}
 
-    document.getElementById('output').style.display = 'block';
-    window.scrollTo({ top: document.getElementById('output').offsetTop - 20, behavior: 'smooth' });
-  }
+function esc(s) {
+  return String(s)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;');
+}
 
-  function esc(s) {
-    return String(s)
-      .replace(/&/g,'&amp;')
-      .replace(/</g,'&lt;')
-      .replace(/>/g,'&gt;');
-  }
+function copyOne(i, btn) {
+  navigator.clipboard.writeText(allPrompts[i]?.prompt || '');
+  btn.textContent = '✓ Copied!';
+  setTimeout(() => btn.textContent = 'Copy', 2000);
+}
 
-  function copyOne(i, btn) {
-    navigator.clipboard.writeText(allPrompts[i].prompt);
-    btn.textContent = 'Copied!';
-    setTimeout(() => btn.textContent = 'Copy', 2000);
-  }
+function copyAll() {
+  const text = allPrompts
+    .map((p, i) => `--- ${p.output_type || 'Content'} ${i+1}: ${p.use_case || ''} ---\n${p.prompt || ''}${p.tip ? '\n\n💡 Tip: ' + p.tip : ''}`)
+    .join('\n\n');
+  navigator.clipboard.writeText(text);
+  const btn = document.querySelector('.copy-all');
+  btn.textContent = '✓ Copied!';
+  setTimeout(() => btn.textContent = '📋 Copy All', 2000);
+}
 
-  function copyAll() {
-    const text = allPrompts
-      .map((p, i) => `Prompt ${i+1} — ${p.use_case}\n${p.prompt}\n\n${p.tip}`)
-      .join('\n\n---\n\n');
-    navigator.clipboard.writeText(text);
-    const btn = document.querySelector('.copy-all');
-    btn.textContent = 'Copied!';
-    setTimeout(() => btn.textContent = 'Copy all', 2000);
-  }
+function resetForm() {
+  document.getElementById('output').style.display = 'none';
+  document.getElementById('formCard').style.display = 'block';
+  document.getElementById('genBtn').disabled = false;
+  allPrompts = [];
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 
-  function resetForm() {
-    document.getElementById('output').style.display = 'none';
-    document.getElementById('formCard').style.display = 'block';
-    document.getElementById('genBtn').disabled = false;
-    allPrompts = [];
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
+function showProModal() {
+  alert('🚀 PromptKit Pro — ₹199/month\n\n✅ Unlimited generations daily\n✅ All content types (6+)\n✅ Save your content history\n✅ PDF export\n✅ Priority support\n\nRazorpay payment coming soon!\nEmail: your-email@gmail.com to pre-register.');
+}
 </script>
 </body>
 </html>
