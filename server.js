@@ -8,6 +8,13 @@ const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 app.use(express.json());
 app.use(express.static(path.join(__dirname)));
 
+// ─── Page Routes ────────────────────────────────────────────────────────────
+app.get('/privacy', (req, res) => res.sendFile('privacy.html', { root: __dirname }));
+app.get('/terms',   (req, res) => res.sendFile('terms.html',   { root: __dirname }));
+app.get('/contact', (req, res) => res.sendFile('contact.html', { root: __dirname }));
+app.get('/about',   (req, res) => res.sendFile('about.html',   { root: __dirname }));
+
+// ─── Generate Prompts ────────────────────────────────────────────────────────
 app.post('/api/generate', async (req, res) => {
   try {
     const { biz, city, lang, prob, category, outputTypes } = req.body;
@@ -59,14 +66,12 @@ Rules:
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userPrompt }
       ],
-      model: 'llama-3.3-70b-versatile',
+      model: 'llama3-70b-8192',
       temperature: 0.8,
       max_tokens: 2000,
     });
 
     const raw = completion.choices[0]?.message?.content || '';
-
-    // Strip markdown code fences if present
     const cleaned = raw.replace(/```json|```/g, '').trim();
 
     let parsed;
@@ -89,5 +94,55 @@ Rules:
   }
 });
 
+// ─── AI Edit Route ───────────────────────────────────────────────────────────
+app.post('/api/edit', async (req, res) => {
+  const { prompt, action } = req.body;
+
+  if (!prompt || !action) {
+    return res.status(400).json({ error: 'prompt aur action dono chahiye' });
+  }
+
+  const instructions = {
+    improve:      'Improve this marketing content — make it more compelling, specific, and effective. Keep the same language.',
+    shorter:      'Make this content shorter and more concise. Remove filler, keep the core message strong.',
+    hindi:        'Rewrite this content completely in Hindi language only.',
+    funny:        'Rewrite this content with a fun, light-hearted, and witty tone. Keep it appropriate for business.',
+    professional: 'Rewrite this content in a formal, polished, professional tone suitable for corporate clients.',
+  };
+
+  const instruction = instructions[action];
+  if (!instruction) {
+    return res.status(400).json({ error: 'Invalid action' });
+  }
+
+  try {
+    const completion = await groq.chat.completions.create({
+      messages: [
+        {
+          role: 'system',
+          content: 'You are an expert marketing copywriter for Indian small businesses. Return ONLY the rewritten content text — no explanation, no quotes, no preamble.',
+        },
+        {
+          role: 'user',
+          content: `${instruction}\n\nOriginal content:\n${prompt}`,
+        },
+      ],
+      model: 'llama3-8b-8192',
+      max_tokens: 500,
+      temperature: 0.8,
+    });
+
+    const result = completion.choices[0]?.message?.content?.trim();
+    if (!result) throw new Error('Empty response from Groq');
+
+    res.json({ result });
+
+  } catch (err) {
+    console.error('Edit error:', err.message);
+    res.status(500).json({ error: 'Edit nahi hua. Dobara try karo.' });
+  }
+});
+
+// ─── Start Server ────────────────────────────────────────────────────────────
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`PromptKit running on port ${PORT}`));
