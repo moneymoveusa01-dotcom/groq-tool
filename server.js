@@ -66,7 +66,7 @@ Rules:
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userPrompt }
       ],
-      model: 'llama3-70b-8192',
+      model: 'llama-3.3-70b-versatile',
       temperature: 0.8,
       max_tokens: 2000,
     });
@@ -127,7 +127,7 @@ app.post('/api/edit', async (req, res) => {
           content: `${instruction}\n\nOriginal content:\n${prompt}`,
         },
       ],
-      model: 'llama3-8b-8192',
+      model: 'llama-3.1-8b-instant',
       max_tokens: 500,
       temperature: 0.8,
     });
