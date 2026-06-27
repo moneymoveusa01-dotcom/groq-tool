@@ -359,6 +359,78 @@ footer {
 }
 footer span { color: #00d4aa; font-weight: 600; }
 footer a:hover { color: #00d4aa; }
+
+.limit-banner {
+  border: 1px solid rgba(0,212,170,0.3);
+  border-radius: 16px;
+  padding: 32px 28px;
+  max-width: 680px;
+  margin: 0 auto 24px;
+  text-align: center;
+  display: none;
+}
+.limit-banner h2 { font-size: 22px; font-weight: 800; margin-bottom: 8px; color: #e6edf3; }
+.limit-banner p { font-size: 14px; color: #7d8590; margin-bottom: 24px; line-height: 1.6; }
+.limit-banner .reset-time { font-size: 12px; color: #7d8590; margin-top: 12px; }
+.limit-banner .reset-time span { color: #00d4aa; font-weight: 600; }
+.pro-features {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 24px;
+  text-align: left;
+}
+@media(max-width:500px){ .pro-features { grid-template-columns: 1fr; } }
+.pro-feature-item {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 13px;
+  color: #c9d1d9;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.pro-feature-item .tick { color: #00d4aa; font-size: 16px; flex-shrink: 0; }
+.btn-pro {
+  width: 100%;
+  background: #00d4aa;
+  color: #0d1117;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 700;
+  padding: 15px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.btn-pro:hover { opacity: 0.88; }
+.usage-bar-wrap {
+  max-width: 680px;
+  margin: 0 auto 16px;
+  display: none;
+}
+.usage-bar-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #7d8590;
+  margin-bottom: 6px;
+}
+.usage-bar-row span:last-child { color: #00d4aa; font-weight: 600; }
+.usage-bar-bg {
+  height: 4px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.usage-bar-fill {
+  height: 100%;
+  background: #00d4aa;
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
 </style>
 </head>
 <body>
@@ -384,6 +456,30 @@ footer a:hover { color: #00d4aa; }
     </div>
   </div>
 </section>
+
+<div class="usage-bar-wrap" id="usageBarWrap">
+  <div class="usage-bar-row">
+    <span>Free prompts used today</span>
+    <span id="usageText">0 / 3</span>
+  </div>
+  <div class="usage-bar-bg">
+    <div class="usage-bar-fill" id="usageFill" style="width:0%"></div>
+  </div>
+</div>
+
+<div class="limit-banner" id="limitBanner">
+  <h2>🚀 You've used all 3 free prompts</h2>
+  <p>PromptKit Pro mein upgrade karo — unlimited prompts, more categories, aur PDF export. Ek chai se bhi sasta.</p>
+  <div class="pro-features">
+    <div class="pro-feature-item"><span class="tick">✓</span> Unlimited prompts daily</div>
+    <div class="pro-feature-item"><span class="tick">✓</span> SEO Blog &amp; YouTube Script</div>
+    <div class="pro-feature-item"><span class="tick">✓</span> Email &amp; SMS templates</div>
+    <div class="pro-feature-item"><span class="tick">✓</span> Save your business profile</div>
+    <div class="pro-feature-item"><span class="tick">✓</span> PDF export of all prompts</div>
+    <div class="pro-feature-item"><span class="tick">✓</span> Priority support</div>
+  </div>
+  <button class="btn-pro" onclick="goToPro()">⚡ Upgrade to Pro — ₹99/month</button>
+</div>
 
 <div class="card" id="formCard">
   <div class="grid2">
@@ -464,6 +560,57 @@ footer a:hover { color: #00d4aa; }
 </footer>
 
 <script>
+// ── Freemium gate ──────────────────────────────────────────────────────────
+const FREE_LIMIT = 3;
+const USAGE_KEY = 'pk_lifetime_usage';
+
+function getUsage() {
+  return parseInt(localStorage.getItem(USAGE_KEY) || '0', 10);
+}
+function incrementUsage() {
+  const n = getUsage() + 1;
+  localStorage.setItem(USAGE_KEY, n);
+  return n;
+}
+function isPro() {
+  return localStorage.getItem('pk_pro') === 'true';
+}
+function updateUsageBar() {
+  if (isPro()) return;
+  const used = getUsage();
+  const wrap = document.getElementById('usageBarWrap');
+  const fill = document.getElementById('usageFill');
+  const text = document.getElementById('usageText');
+  if (used > 0) {
+    wrap.style.display = 'block';
+    fill.style.width = Math.min((used / FREE_LIMIT) * 100, 100) + '%';
+    text.textContent = used + ' / ' + FREE_LIMIT + ' free prompts used';
+    if (used >= FREE_LIMIT) fill.style.background = '#f85149';
+  }
+}
+function showLimitBanner() {
+  document.getElementById('formCard').style.display = 'none';
+  document.getElementById('usageBarWrap').style.display = 'none';
+  document.getElementById('output').style.display = 'none';
+  document.getElementById('limitBanner').style.display = 'block';
+}
+function goToPro() {
+  alert('Coming soon! Email us at hello@promptkitindia.com for early Pro access.');
+}
+
+// Init on load
+document.addEventListener('DOMContentLoaded', () => {
+  // Owner bypass — secret URL param
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('owner') === 'MAHESH2024') {
+    localStorage.setItem('pk_pro', 'true');
+    history.replaceState({}, '', window.location.pathname);
+  }
+  updateUsageBar();
+  if (!isPro() && getUsage() >= FREE_LIMIT) showLimitBanner();
+});
+// ──────────────────────────────────────────────────────────────────────────
+
 document.querySelectorAll('.chip').forEach(c => {
   c.addEventListener('click', () => {
     document.querySelectorAll('.chip').forEach(x => x.classList.remove('active'));
@@ -486,6 +633,11 @@ async function generate() {
     errEl.style.display = 'block';
     return;
   }
+  // Freemium check
+  if (!isPro() && getUsage() >= FREE_LIMIT) {
+    showLimitBanner();
+    return;
+  }
   document.getElementById('genBtn').disabled = true;
   document.getElementById('formCard').style.display = 'none';
   document.getElementById('loader').style.display = 'block';
@@ -500,6 +652,16 @@ async function generate() {
     const data = await res.json();
     if (data.error) throw new Error(data.error);
     allPrompts = data.prompts;
+    if (!isPro()) {
+      const used = incrementUsage();
+      updateUsageBar();
+      if (used >= FREE_LIMIT) {
+        setTimeout(() => {
+          document.getElementById('usageBarWrap').style.display = 'none';
+          showLimitBanner();
+        }, 8000);
+      }
+    }
     renderOutput(data);
   } catch(e) {
     document.getElementById('formCard').style.display = 'block';
