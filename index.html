@@ -5,6 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PromptKit India — AI Prompts for Your Business</title>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 body {
@@ -46,8 +47,6 @@ h1 span { color: #00d4aa; }
   max-width: 460px;
   margin: 0 auto 28px;
 }
-
-/* CHANGE 1: Live Example */
 .hero-example {
   background: #161b22;
   border: 1px solid rgba(0,212,170,0.2);
@@ -103,6 +102,33 @@ h1 span { color: #00d4aa; }
   margin-bottom: 4px;
 }
 .ex-val { color: #e6edf3; }
+
+/* Progress bar */
+.progress-bar-wrap {
+  max-width: 680px;
+  margin: 0 auto 4px;
+  padding: 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #7d8590;
+}
+.progress-bar-wrap .used-count { color: #00d4aa; font-weight: 600; }
+.progress-track {
+  max-width: 680px;
+  margin: 0 auto 16px;
+  height: 3px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: #00d4aa;
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
 
 .card {
   background: #161b22;
@@ -185,8 +211,6 @@ select option { background: #1f2937; }
   margin-bottom: 14px;
   display: none;
 }
-
-/* CHANGE 2: Strong CTA */
 .btn {
   width: 100%;
   background: #00d4aa;
@@ -208,6 +232,99 @@ select option { background: #1f2937; }
   color: #7d8590;
   margin-top: 8px;
 }
+
+/* ── Paywall ── */
+#paywall {
+  display: none;
+  max-width: 680px;
+  margin: 0 auto 48px;
+  background: #161b22;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  padding: 36px 28px;
+  text-align: center;
+}
+#paywall h2 {
+  font-size: 22px;
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+#paywall .sub {
+  font-size: 14px;
+  color: #7d8590;
+  margin-bottom: 28px;
+}
+.features-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 28px;
+  text-align: left;
+}
+@media(max-width: 500px) { .features-grid { grid-template-columns: 1fr; } }
+.feature-item {
+  background: #0d1117;
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 13px;
+  color: #c9d1d9;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.feature-item .tick { color: #00d4aa; font-size: 15px; flex-shrink: 0; }
+.pay-btn {
+  width: 100%;
+  background: #00d4aa;
+  color: #0d1117;
+  border: none;
+  border-radius: 10px;
+  font-size: 17px;
+  font-weight: 800;
+  padding: 16px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  letter-spacing: 0.01em;
+}
+.pay-btn:hover { opacity: 0.88; }
+.pay-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.pay-note {
+  font-size: 12px;
+  color: #7d8590;
+  margin-top: 10px;
+}
+.plan-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+@media(max-width: 500px) { .plan-cards { grid-template-columns: 1fr; } }
+.plan-card {
+  background: #0d1117;
+  border: 2px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  padding: 18px 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  text-align: center;
+}
+.plan-card:hover { border-color: #00d4aa; }
+.plan-card.selected { border-color: #00d4aa; background: rgba(0,212,170,0.06); }
+.plan-card.popular { border-color: #00d4aa; background: rgba(0,212,170,0.06); }
+.popular-badge {
+  font-size: 11px;
+  font-weight: 700;
+  color: #00d4aa;
+  margin-bottom: 6px;
+  letter-spacing: 0.04em;
+}
+.plan-name { font-size: 13px; font-weight: 600; color: #7d8590; margin-bottom: 6px; }
+.plan-price { font-size: 26px; font-weight: 800; color: #e6edf3; margin-bottom: 4px; }
+.plan-price span { font-size: 13px; font-weight: 500; color: #7d8590; }
+.plan-desc { font-size: 12px; color: #7d8590; }
 
 .loader {
   text-align: center;
@@ -297,8 +414,6 @@ select option { background: #1f2937; }
   border-top: 1px solid rgba(255,255,255,0.06);
   font-style: italic;
 }
-
-/* CHANGE 3: AI Edit Bar */
 .edit-bar {
   padding: 12px 18px 14px;
   border-top: 1px solid rgba(255,255,255,0.06);
@@ -359,78 +474,6 @@ footer {
 }
 footer span { color: #00d4aa; font-weight: 600; }
 footer a:hover { color: #00d4aa; }
-
-.limit-banner {
-  border: 1px solid rgba(0,212,170,0.3);
-  border-radius: 16px;
-  padding: 32px 28px;
-  max-width: 680px;
-  margin: 0 auto 24px;
-  text-align: center;
-  display: none;
-}
-.limit-banner h2 { font-size: 22px; font-weight: 800; margin-bottom: 8px; color: #e6edf3; }
-.limit-banner p { font-size: 14px; color: #7d8590; margin-bottom: 24px; line-height: 1.6; }
-.limit-banner .reset-time { font-size: 12px; color: #7d8590; margin-top: 12px; }
-.limit-banner .reset-time span { color: #00d4aa; font-weight: 600; }
-.pro-features {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-bottom: 24px;
-  text-align: left;
-}
-@media(max-width:500px){ .pro-features { grid-template-columns: 1fr; } }
-.pro-feature-item {
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.07);
-  border-radius: 10px;
-  padding: 12px 14px;
-  font-size: 13px;
-  color: #c9d1d9;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.pro-feature-item .tick { color: #00d4aa; font-size: 16px; flex-shrink: 0; }
-.btn-pro {
-  width: 100%;
-  background: #00d4aa;
-  color: #0d1117;
-  border: none;
-  border-radius: 10px;
-  font-size: 16px;
-  font-weight: 700;
-  padding: 15px;
-  cursor: pointer;
-  transition: opacity 0.2s;
-}
-.btn-pro:hover { opacity: 0.88; }
-.usage-bar-wrap {
-  max-width: 680px;
-  margin: 0 auto 16px;
-  display: none;
-}
-.usage-bar-row {
-  display: flex;
-  justify-content: space-between;
-  font-size: 12px;
-  color: #7d8590;
-  margin-bottom: 6px;
-}
-.usage-bar-row span:last-child { color: #00d4aa; font-weight: 600; }
-.usage-bar-bg {
-  height: 4px;
-  background: rgba(255,255,255,0.06);
-  border-radius: 4px;
-  overflow: hidden;
-}
-.usage-bar-fill {
-  height: 100%;
-  background: #00d4aa;
-  border-radius: 4px;
-  transition: width 0.4s ease;
-}
 </style>
 </head>
 <body>
@@ -440,7 +483,6 @@ footer a:hover { color: #00d4aa; }
   <h1>Prompts that <span>work</span><br>for your business</h1>
   <p class="hero-sub">Apna business type batao — 5 custom, copy-paste ready AI prompts milenge seconds mein. Hindi + English. Free.</p>
 
-  <!-- CHANGE 1: Hero Live Example -->
   <div class="hero-example">
     <div class="hero-example-label">✦ Live Example</div>
     <div class="hero-example-row">
@@ -457,28 +499,13 @@ footer a:hover { color: #00d4aa; }
   </div>
 </section>
 
-<div class="usage-bar-wrap" id="usageBarWrap">
-  <div class="usage-bar-row">
-    <span>Free prompts used today</span>
-    <span id="usageText">0 / 3</span>
-  </div>
-  <div class="usage-bar-bg">
-    <div class="usage-bar-fill" id="usageFill" style="width:0%"></div>
-  </div>
+<!-- Progress Bar -->
+<div class="progress-bar-wrap" id="progressWrap">
+  <span>Free prompts used today</span>
+  <span class="used-count" id="usedCount">0 / 3 free prompts used</span>
 </div>
-
-<div class="limit-banner" id="limitBanner">
-  <h2>🚀 You've used all 3 free prompts</h2>
-  <p>PromptKit Pro mein upgrade karo — unlimited prompts, more categories, aur PDF export. Ek chai se bhi sasta.</p>
-  <div class="pro-features">
-    <div class="pro-feature-item"><span class="tick">✓</span> Unlimited prompts daily</div>
-    <div class="pro-feature-item"><span class="tick">✓</span> SEO Blog &amp; YouTube Script</div>
-    <div class="pro-feature-item"><span class="tick">✓</span> Email &amp; SMS templates</div>
-    <div class="pro-feature-item"><span class="tick">✓</span> Save your business profile</div>
-    <div class="pro-feature-item"><span class="tick">✓</span> PDF export of all prompts</div>
-    <div class="pro-feature-item"><span class="tick">✓</span> Priority support</div>
-  </div>
-  <button class="btn-pro" onclick="goToPro()">⚡ Upgrade to Pro — ₹99/month</button>
+<div class="progress-track">
+  <div class="progress-fill" id="progressFill" style="width: 0%"></div>
 </div>
 
 <div class="card" id="formCard">
@@ -524,9 +551,40 @@ footer a:hover { color: #00d4aa; }
 
   <div class="err" id="err"></div>
 
-  <!-- CHANGE 2: Strong CTA -->
   <button class="btn" id="genBtn" onclick="generate()">🚀 Generate 3 Free AI Prompts</button>
   <p class="btn-note">No signup needed &nbsp;·&nbsp; Instant results</p>
+</div>
+
+<!-- Paywall -->
+<div id="paywall">
+  <h2>🚀 You've used all 3 free prompts</h2>
+  <p class="sub">PromptKit Pro mein upgrade karo — unlimited prompts, more categories, aur PDF export.</p>
+  <div class="features-grid">
+    <div class="feature-item"><span class="tick">✓</span> Unlimited prompts daily</div>
+    <div class="feature-item"><span class="tick">✓</span> SEO Blog &amp; YouTube Script</div>
+    <div class="feature-item"><span class="tick">✓</span> Email &amp; SMS templates</div>
+    <div class="feature-item"><span class="tick">✓</span> Save your business profile</div>
+    <div class="feature-item"><span class="tick">✓</span> PDF export of all prompts</div>
+    <div class="feature-item"><span class="tick">✓</span> Priority support</div>
+  </div>
+
+  <!-- Plan Cards -->
+  <div class="plan-cards">
+    <div class="plan-card" id="plan-monthly" onclick="selectPlan('monthly')">
+      <div class="plan-name">Monthly</div>
+      <div class="plan-price">₹199<span>/month</span></div>
+      <div class="plan-desc">Har mahine renew hoga</div>
+    </div>
+    <div class="plan-card popular" id="plan-quarterly" onclick="selectPlan('quarterly')">
+      <div class="popular-badge">🔥 Most Popular</div>
+      <div class="plan-name">3 Months</div>
+      <div class="plan-price">₹449<span>/3 months</span></div>
+      <div class="plan-desc">Save ₹148 — best value!</div>
+    </div>
+  </div>
+
+  <button class="pay-btn" id="payBtn" onclick="startPayment()">⚡ Continue with 3-Month Plan — ₹449</button>
+  <p class="pay-note">Secure payment via Razorpay &nbsp;·&nbsp; Cancel anytime</p>
 </div>
 
 <div class="loader" id="loader">
@@ -560,57 +618,41 @@ footer a:hover { color: #00d4aa; }
 </footer>
 
 <script>
-// ── Freemium gate ──────────────────────────────────────────────────────────
+// ── Pro Status ──────────────────────────────────────────────────────────────
+// Pro status session mein store hota hai (tab band hone pe reset)
+// Production mein database se check karna hoga
+let isPro = sessionStorage.getItem('promptkit_pro') === 'true';
+
+// ── Usage Tracking ──────────────────────────────────────────────────────────
 const FREE_LIMIT = 3;
-const USAGE_KEY = 'pk_lifetime_usage';
 
 function getUsage() {
-  return parseInt(localStorage.getItem(USAGE_KEY) || '0', 10);
+  const today = new Date().toDateString();
+  const stored = JSON.parse(localStorage.getItem('promptkit_usage') || '{}');
+  if (stored.date !== today) return 0;
+  return stored.count || 0;
 }
+
 function incrementUsage() {
-  const n = getUsage() + 1;
-  localStorage.setItem(USAGE_KEY, n);
-  return n;
+  const today = new Date().toDateString();
+  const count = getUsage() + 1;
+  localStorage.setItem('promptkit_usage', JSON.stringify({ date: today, count }));
+  updateProgressBar();
 }
-function isPro() {
-  return localStorage.getItem('pk_pro') === 'true';
-}
-function updateUsageBar() {
-  if (isPro()) return;
+
+function updateProgressBar() {
+  if (isPro) {
+    document.getElementById('progressWrap').style.display = 'none';
+    document.querySelector('.progress-track').style.display = 'none';
+    return;
+  }
   const used = getUsage();
-  const wrap = document.getElementById('usageBarWrap');
-  const fill = document.getElementById('usageFill');
-  const text = document.getElementById('usageText');
-  if (used > 0) {
-    wrap.style.display = 'block';
-    fill.style.width = Math.min((used / FREE_LIMIT) * 100, 100) + '%';
-    text.textContent = used + ' / ' + FREE_LIMIT + ' free prompts used';
-    if (used >= FREE_LIMIT) fill.style.background = '#f85149';
-  }
-}
-function showLimitBanner() {
-  document.getElementById('formCard').style.display = 'none';
-  document.getElementById('usageBarWrap').style.display = 'none';
-  document.getElementById('output').style.display = 'none';
-  document.getElementById('limitBanner').style.display = 'block';
-}
-function goToPro() {
-  alert('Coming soon! Email us at hello@promptkitindia.com for early Pro access.');
+  const pct = Math.min((used / FREE_LIMIT) * 100, 100);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('usedCount').textContent = `${used} / ${FREE_LIMIT} free prompts used`;
 }
 
-// Init on load
-document.addEventListener('DOMContentLoaded', () => {
-  // Owner bypass — secret URL param
-  const params = new URLSearchParams(window.location.search);
-  if (params.get('owner') === 'MAHESH2024') {
-    localStorage.setItem('pk_pro', 'true');
-    history.replaceState({}, '', window.location.pathname);
-  }
-  updateUsageBar();
-  if (!isPro() && getUsage() >= FREE_LIMIT) showLimitBanner();
-});
-// ──────────────────────────────────────────────────────────────────────────
-
+// ── Chip Selection ──────────────────────────────────────────────────────────
 document.querySelectorAll('.chip').forEach(c => {
   c.addEventListener('click', () => {
     document.querySelectorAll('.chip').forEach(x => x.classList.remove('active'));
@@ -620,6 +662,7 @@ document.querySelectorAll('.chip').forEach(c => {
 
 let allPrompts = [];
 
+// ── Generate ────────────────────────────────────────────────────────────────
 async function generate() {
   const biz = document.getElementById('biz').value.trim();
   const city = document.getElementById('city').value.trim();
@@ -628,20 +671,24 @@ async function generate() {
   const cat = document.querySelector('.chip.active')?.dataset.v || 'Social Media';
   const errEl = document.getElementById('err');
   errEl.style.display = 'none';
+
   if (!biz) {
     errEl.textContent = 'Please enter your business type first.';
     errEl.style.display = 'block';
     return;
   }
-  // Freemium check
-  if (!isPro() && getUsage() >= FREE_LIMIT) {
-    showLimitBanner();
+
+  // Paywall check — skip if Pro
+  if (!isPro && getUsage() >= FREE_LIMIT) {
+    showPaywall();
     return;
   }
+
   document.getElementById('genBtn').disabled = true;
   document.getElementById('formCard').style.display = 'none';
   document.getElementById('loader').style.display = 'block';
   document.getElementById('output').style.display = 'none';
+
   try {
     const res = await fetch('/api/generate', {
       method: 'POST',
@@ -651,17 +698,9 @@ async function generate() {
     if (!res.ok) throw new Error('Server error');
     const data = await res.json();
     if (data.error) throw new Error(data.error);
+
     allPrompts = data.prompts;
-    if (!isPro()) {
-      const used = incrementUsage();
-      updateUsageBar();
-      if (used >= FREE_LIMIT) {
-        setTimeout(() => {
-          document.getElementById('usageBarWrap').style.display = 'none';
-          showLimitBanner();
-        }, 8000);
-      }
-    }
+    incrementUsage();
     renderOutput(data);
   } catch(e) {
     document.getElementById('formCard').style.display = 'block';
@@ -672,7 +711,107 @@ async function generate() {
   document.getElementById('loader').style.display = 'none';
 }
 
-// CHANGE 3: Render with AI edit buttons
+// ── Paywall ─────────────────────────────────────────────────────────────────
+let selectedPlan = 'quarterly'; // default: 3-month plan
+
+function selectPlan(plan) {
+  selectedPlan = plan;
+  document.getElementById('plan-monthly').classList.remove('selected');
+  document.getElementById('plan-quarterly').classList.remove('selected');
+  document.getElementById('plan-' + plan).classList.add('selected');
+
+  const btn = document.getElementById('payBtn');
+  if (plan === 'monthly') {
+    btn.textContent = '⚡ Continue with Monthly Plan — ₹199';
+  } else {
+    btn.textContent = '⚡ Continue with 3-Month Plan — ₹449';
+  }
+}
+
+function showPaywall() {
+  document.getElementById('formCard').style.display = 'none';
+  document.getElementById('output').style.display = 'none';
+  document.getElementById('paywall').style.display = 'block';
+  // Default: quarterly selected
+  document.getElementById('plan-quarterly').classList.add('selected');
+  window.scrollTo({ top: document.getElementById('paywall').offsetTop - 20, behavior: 'smooth' });
+}
+
+async function startPayment() {
+  const btn = document.getElementById('payBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Processing...';
+
+  const amount = selectedPlan === 'monthly' ? 19900 : 44900; // paise mein
+  const desc   = selectedPlan === 'monthly' ? 'Pro Plan — ₹199/month' : 'Pro Plan — ₹449/3 months';
+
+  try {
+    // Step 1: Order create karo
+    const orderRes = await fetch('/api/create-order', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ amount })
+    });
+    const order = await orderRes.json();
+
+    if (order.error) throw new Error(order.error);
+
+    // Step 2: Razorpay checkout open karo
+    const options = {
+      key: 'rzp_test_T7MwlfphbriQ0o', // Test key — production mein live key dalna
+      amount: order.amount,
+      currency: 'INR',
+      name: 'PromptKit India',
+      description: desc,
+      order_id: order.id,
+      handler: async function(response) {
+        // Step 3: Payment verify karo
+        const verifyRes = await fetch('/api/verify-payment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(response)
+        });
+        const result = await verifyRes.json();
+
+        if (result.success) {
+          isPro = true;
+          sessionStorage.setItem('promptkit_pro', 'true');
+          document.getElementById('paywall').style.display = 'none';
+          document.getElementById('formCard').style.display = 'block';
+          document.getElementById('genBtn').textContent = '🚀 Generate AI Prompts (Pro)';
+          document.getElementById('genBtn').disabled = false;
+          updateProgressBar();
+          alert('🎉 Pro activated! Ab unlimited prompts generate karo.');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+          alert('Payment verify nahi hua. Support se contact karo.');
+        }
+      },
+      prefill: { name: '', email: '' },
+      theme: { color: '#00d4aa' },
+      modal: {
+        ondismiss: function() {
+          btn.disabled = false;
+          btn.textContent = selectedPlan === 'monthly'
+            ? '⚡ Continue with Monthly Plan — ₹199'
+            : '⚡ Continue with 3-Month Plan — ₹449';
+        }
+      }
+    };
+
+    new Razorpay(options).open();
+
+  } catch(e) {
+    console.error('Payment error:', e);
+    alert('Payment shuru nahi hua. Dobara try karo.');
+    btn.disabled = false;
+    btn.textContent = selectedPlan === 'monthly'
+      ? '⚡ Continue with Monthly Plan — ₹199'
+      : '⚡ Continue with 3-Month Plan — ₹449';
+  }
+}
+
+// ── Render Output ────────────────────────────────────────────────────────────
 const EDIT_ACTIONS = [
   { label: '✨ Improve',      action: 'improve' },
   { label: '📏 Shorter',      action: 'shorter' },
@@ -713,7 +852,6 @@ function renderOutput(data) {
     list.appendChild(d);
   });
 
-  // Attach edit listeners
   document.querySelectorAll('.edit-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const idx = parseInt(btn.dataset.idx);
@@ -732,7 +870,6 @@ async function editPrompt(idx, action, clickedBtn) {
   const tipEl  = document.getElementById(`ptip-${idx}`);
   const btns = card.querySelectorAll('.edit-btn');
 
-  // Disable all buttons in this card
   btns.forEach(b => { b.disabled = true; });
   const origLabel = clickedBtn.textContent;
   clickedBtn.textContent = '⏳ …';
@@ -748,7 +885,6 @@ async function editPrompt(idx, action, clickedBtn) {
     const data = await res.json();
     if (data.error) throw new Error(data.error);
 
-    // Update stored + displayed prompt
     allPrompts[idx].prompt = data.result;
     bodyEl.textContent = data.result;
     tipEl.textContent = '✨ AI ne edit kiya — copy karo!';
@@ -786,12 +922,22 @@ function copyAll() {
 }
 
 function resetForm() {
+  // Paywall check before resetting
+  if (!isPro && getUsage() >= FREE_LIMIT) {
+    document.getElementById('output').style.display = 'none';
+    showPaywall();
+    return;
+  }
   document.getElementById('output').style.display = 'none';
+  document.getElementById('paywall').style.display = 'none';
   document.getElementById('formCard').style.display = 'block';
   document.getElementById('genBtn').disabled = false;
   allPrompts = [];
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
+
+// Init
+updateProgressBar();
 </script>
 </body>
 </html>
