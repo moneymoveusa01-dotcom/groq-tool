@@ -15,6 +15,75 @@ const razorpay = new Razorpay({
 app.use(express.json());
 app.use(express.static(path.join(__dirname)));
 
+// ─── Owner Bypass (server-side, secret never lives in code) ─────────────────
+// 1. Hosting platform (Render/Vercel/Railway etc.) ke Environment Variables mein
+//    OWNER_KEY = <koi bhi lamba random secret string> set karo. Yeh GitHub pe
+//    kabhi push nahi hota — sirf hosting dashboard mein rehta hai, sirf tumhe pata.
+// 2. Ek baar browser mein visit karo: https://yourdomain.com/owner-unlock?key=YOUR_SECRET
+//    Yeh ek signed, httpOnly cookie set karega jo koi forge nahi kar sakta bina
+//    OWNER_KEY jaane — chahe wo localStorage/cookies dekh bhi le.
+// 3. Uske baad us browser mein hamesha Pro/unlimited access milega.
+const OWNER_KEY = process.env.OWNER_KEY || '';
+const OWNER_COOKIE_NAME = 'pk_owner';
+const OWNER_COOKIE_MAX_AGE = 60 * 60 * 24 * 365; // 1 saal
+
+function signOwnerToken() {
+  const payload = 'owner';
+  const sig = crypto.createHmac('sha256', OWNER_KEY).update(payload).digest('hex');
+  return `${payload}.${sig}`;
+}
+
+function isValidOwnerToken(token) {
+  if (!OWNER_KEY || !token) return false;
+  const [payload, sig] = token.split('.');
+  if (payload !== 'owner' || !sig) return false;
+  const expected = crypto.createHmac('sha256', OWNER_KEY).update(payload).digest('hex');
+  // timing-safe comparison
+  const a = Buffer.from(sig);
+  const b = Buffer.from(expected);
+  if (a.length !== b.length) return false;
+  return crypto.timingSafeEqual(a, b);
+}
+
+function parseCookies(req) {
+  const header = req.headers.cookie;
+  const out = {};
+  if (!header) return out;
+  header.split(';').forEach(part => {
+    const idx = part.indexOf('=');
+    if (idx === -1) return;
+    const k = part.slice(0, idx).trim();
+    const v = part.slice(idx + 1).trim();
+    out[k] = decodeURIComponent(v);
+  });
+  return out;
+}
+
+function isOwnerRequest(req) {
+  const cookies = parseCookies(req);
+  return isValidOwnerToken(cookies[OWNER_COOKIE_NAME]);
+}
+
+// Visit this once with your secret key to unlock permanently on that browser.
+app.get('/owner-unlock', (req, res) => {
+  if (!OWNER_KEY) {
+    return res.status(500).send('OWNER_KEY env variable set nahi hai server par.');
+  }
+  if (req.query.key !== OWNER_KEY) {
+    return res.status(403).send('Invalid key.');
+  }
+  const token = signOwnerToken();
+  res.setHeader('Set-Cookie',
+    `${OWNER_COOKIE_NAME}=${encodeURIComponent(token)}; Max-Age=${OWNER_COOKIE_MAX_AGE}; Path=/; HttpOnly; Secure; SameSite=Lax`
+  );
+  res.redirect('/');
+});
+
+// Frontend isse poochta hai ki current browser owner-unlocked hai ya nahi.
+app.get('/api/owner-status', (req, res) => {
+  res.json({ isOwner: isOwnerRequest(req) });
+});
+
 // ─── Page Routes ────────────────────────────────────────────────────────────
 const pageStyle = `
   <style>
