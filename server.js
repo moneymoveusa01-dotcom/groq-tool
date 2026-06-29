@@ -219,7 +219,7 @@ Rules:
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userPrompt }
       ],
-      model: 'llama-3.3-70b-versatile',
+      model: 'qwen/qwen3.6-27b',
       temperature: 0.8,
       max_tokens: 2000,
     });
@@ -280,7 +280,7 @@ app.post('/api/edit', async (req, res) => {
           content: `${instruction}\n\nOriginal content:\n${prompt}`,
         },
       ],
-      model: 'llama-3.1-8b-instant',
+      model: 'openai/gpt-oss-20b',
       max_tokens: 500,
       temperature: 0.8,
     });
