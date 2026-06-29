@@ -313,7 +313,6 @@ select option { background: #1f2937; }
 }
 .plan-card:hover { border-color: #00d4aa; }
 .plan-card.selected { border-color: #00d4aa; background: rgba(0,212,170,0.06); }
-.plan-card.popular { border-color: #00d4aa; background: rgba(0,212,170,0.06); }
 .popular-badge {
   font-size: 11px;
   font-weight: 700;
@@ -575,7 +574,7 @@ footer a:hover { color: #00d4aa; }
       <div class="plan-price">₹199<span>/month</span></div>
       <div class="plan-desc">Har mahine renew hoga</div>
     </div>
-    <div class="plan-card popular" id="plan-quarterly" onclick="selectPlan('quarterly')">
+    <div class="plan-card selected" id="plan-quarterly" onclick="selectPlan('quarterly')">
       <div class="popular-badge">🔥 Most Popular</div>
       <div class="plan-name">3 Months</div>
       <div class="plan-price">₹449<span>/3 months</span></div>
@@ -732,8 +731,7 @@ function showPaywall() {
   document.getElementById('formCard').style.display = 'none';
   document.getElementById('output').style.display = 'none';
   document.getElementById('paywall').style.display = 'block';
-  // Default: quarterly selected
-  document.getElementById('plan-quarterly').classList.add('selected');
+  selectPlan('quarterly'); // default quarterly selected
   window.scrollTo({ top: document.getElementById('paywall').offsetTop - 20, behavior: 'smooth' });
 }
 
