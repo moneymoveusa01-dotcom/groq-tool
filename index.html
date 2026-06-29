@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -617,10 +618,31 @@ footer a:hover { color: #00d4aa; }
 </footer>
 
 <script>
+// ── Owner Bypass (server-verified) ────────────────────────────────────────────
+// Yeh ab purely server-side cookie se verify hota hai (/owner-unlock route se set
+// hota hai, secret OWNER_KEY env var ke through). Koi bhi browser console se
+// isko forge nahi kar sakta — sirf woh device jisne sahi secret URL khola ho.
+let isOwner = false;
+
 // ── Pro Status ──────────────────────────────────────────────────────────────
 // Pro status session mein store hota hai (tab band hone pe reset)
 // Production mein database se check karna hoga
 let isPro = sessionStorage.getItem('promptkit_pro') === 'true';
+
+async function checkOwnerStatus() {
+  try {
+    const res = await fetch('/api/owner-status');
+    const data = await res.json();
+    if (data.isOwner) {
+      isOwner = true;
+      isPro = true;
+      updateProgressBar();
+    }
+  } catch (e) {
+    // server reachable nahi — normal flow continue hoga
+  }
+}
+checkOwnerStatus();
 
 // ── Usage Tracking ──────────────────────────────────────────────────────────
 const FREE_LIMIT = 3;
@@ -650,6 +672,7 @@ function updateProgressBar() {
   document.getElementById('progressFill').style.width = pct + '%';
   document.getElementById('usedCount').textContent = `${used} / ${FREE_LIMIT} free prompts used`;
 }
+
 
 // ── Chip Selection ──────────────────────────────────────────────────────────
 document.querySelectorAll('.chip').forEach(c => {
