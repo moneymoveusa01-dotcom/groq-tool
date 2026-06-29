@@ -1,9 +1,16 @@
 const express = require('express');
 const path = require('path');
 const Groq = require('groq-sdk');
+const Razorpay = require('razorpay');
+const crypto = require('crypto');
 
 const app = express();
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+
+const razorpay = new Razorpay({
+  key_id: process.env.RAZORPAY_KEY_ID,
+  key_secret: process.env.RAZORPAY_KEY_SECRET,
+});
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname)));
@@ -113,6 +120,52 @@ app.get('/about', (req, res) => res.send(`<!DOCTYPE html><html lang="en"><head><
       <p>No signup. No credit card. Just results.</p>
     </div>
   </div></body></html>`));
+
+// ─── Razorpay: Create Order ──────────────────────────────────────────────────
+app.post('/api/create-order', async (req, res) => {
+  try {
+    const { amount } = req.body;
+
+    // Valid amounts sirf: 19900 (₹199) ya 44900 (₹449)
+    const validAmounts = [19900, 44900];
+    if (!validAmounts.includes(amount)) {
+      return res.status(400).json({ error: 'Invalid amount' });
+    }
+
+    const order = await razorpay.orders.create({
+      amount,
+      currency: 'INR',
+      receipt: `receipt_${Date.now()}`,
+    });
+    res.json(order);
+  } catch (err) {
+    console.error('Razorpay order error:', err.message);
+    res.status(500).json({ error: 'Order create nahi hua. Dobara try karo.' });
+  }
+});
+
+// ─── Razorpay: Verify Payment ────────────────────────────────────────────────
+app.post('/api/verify-payment', (req, res) => {
+  try {
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
+
+    const sign = razorpay_order_id + '|' + razorpay_payment_id;
+    const expected = crypto
+      .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+      .update(sign)
+      .digest('hex');
+
+    if (expected === razorpay_signature) {
+      // Payment verified — frontend ko Pro unlock signal bhejo
+      res.json({ success: true, payment_id: razorpay_payment_id });
+    } else {
+      res.status(400).json({ success: false, error: 'Invalid payment signature' });
+    }
+  } catch (err) {
+    console.error('Verify error:', err.message);
+    res.status(500).json({ success: false, error: 'Verification failed' });
+  }
+});
 
 // ─── Generate Prompts ────────────────────────────────────────────────────────
 app.post('/api/generate', async (req, res) => {
