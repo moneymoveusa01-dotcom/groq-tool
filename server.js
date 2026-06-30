@@ -84,7 +84,72 @@ app.get('/api/owner-status', (req, res) => {
   res.json({ isOwner: isOwnerRequest(req) });
 });
 
-// ─── Page Routes ────────────────────────────────────────────────────────────
+// ─── Free Usage Limit (server-side, lifetime, bypass-proof) ─────────────────
+// Free users get FREE_LIMIT prompt generations TOTAL, ever — not daily.
+// Enforced via a signed httpOnly cookie (can't be edited/forged client-side)
+// PLUS an in-memory IP counter as a second layer (catches cookie-clearing/
+// incognito tricks within the same server uptime). Owner always bypasses.
+const FREE_LIMIT = 3;
+const USAGE_COOKIE_NAME = 'pk_usage';
+const USAGE_COOKIE_MAX_AGE = 60 * 60 * 24 * 365 * 5; // 5 saal — practically permanent
+
+function signUsageToken(count) {
+  const payload = String(count);
+  const sig = crypto.createHmac('sha256', OWNER_KEY || 'fallback-secret-change-me').update(payload).digest('hex');
+  return `${payload}.${sig}`;
+}
+
+function readUsageToken(token) {
+  if (!token) return 0;
+  const [payload, sig] = token.split('.');
+  if (!payload || !sig) return 0;
+  const expected = crypto.createHmac('sha256', OWNER_KEY || 'fallback-secret-change-me').update(payload).digest('hex');
+  const a = Buffer.from(sig);
+  const b = Buffer.from(expected);
+  if (a.length !== b.length) return 0;
+  if (!crypto.timingSafeEqual(a, b)) return 0; // tampered cookie — treat as 0 (safe default), real count still enforced via IP layer
+  const n = parseInt(payload, 10);
+  return Number.isFinite(n) && n >= 0 ? n : 0;
+}
+
+// In-memory IP fallback (resets on server restart — acceptable second layer,
+// not the primary defense; cookie + payment unlock is primary).
+const ipUsage = new Map();
+
+function getClientIp(req) {
+  const fwd = req.headers['x-forwarded-for'];
+  return (fwd ? fwd.split(',')[0].trim() : req.socket.remoteAddress) || 'unknown';
+}
+
+function getFreeUsage(req) {
+  const cookies = parseCookies(req);
+  const cookieCount = readUsageToken(cookies[USAGE_COOKIE_NAME]);
+  const ip = getClientIp(req);
+  const ipCount = ipUsage.get(ip) || 0;
+  return Math.max(cookieCount, ipCount);
+}
+
+function incrementFreeUsage(req, res) {
+  const current = getFreeUsage(req);
+  const next = current + 1;
+  res.setHeader('Set-Cookie',
+    `${USAGE_COOKIE_NAME}=${encodeURIComponent(signUsageToken(next))}; Max-Age=${USAGE_COOKIE_MAX_AGE}; Path=/; HttpOnly; Secure; SameSite=Lax`
+  );
+  const ip = getClientIp(req);
+  ipUsage.set(ip, next);
+  return next;
+}
+
+// Frontend isse poochta hai: kitne free prompts bache hain (lifetime).
+app.get('/api/usage-status', (req, res) => {
+  if (isOwnerRequest(req) || isProRequest(req)) {
+    return res.json({ isOwner: isOwnerRequest(req), isPro: true, used: 0, limit: FREE_LIMIT, remaining: Infinity });
+  }
+  const used = getFreeUsage(req);
+  res.json({ isOwner: false, isPro: false, used, limit: FREE_LIMIT, remaining: Math.max(FREE_LIMIT - used, 0) });
+});
+
+
 const pageStyle = `
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -214,6 +279,8 @@ app.post('/api/create-order', async (req, res) => {
 });
 
 // ─── Razorpay: Verify Payment ────────────────────────────────────────────────
+const PRO_COOKIE_NAME = 'pk_pro';
+
 app.post('/api/verify-payment', (req, res) => {
   try {
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
@@ -225,7 +292,15 @@ app.post('/api/verify-payment', (req, res) => {
       .digest('hex');
 
     if (expected === razorpay_signature) {
-      // Payment verified — frontend ko Pro unlock signal bhejo
+      // Payment verified — server-side signed Pro cookie issue karo, taaki
+      // /api/generate isse trust kar sake (sirf sessionStorage pe bharosa nahi)
+      const token = crypto
+        .createHmac('sha256', OWNER_KEY || 'fallback-secret-change-me')
+        .update(`pro.${razorpay_payment_id}`)
+        .digest('hex');
+      res.setHeader('Set-Cookie',
+        `${PRO_COOKIE_NAME}=${encodeURIComponent(`${razorpay_payment_id}.${token}`)}; Max-Age=${USAGE_COOKIE_MAX_AGE}; Path=/; HttpOnly; Secure; SameSite=Lax`
+      );
       res.json({ success: true, payment_id: razorpay_payment_id });
     } else {
       res.status(400).json({ success: false, error: 'Invalid payment signature' });
@@ -236,9 +311,39 @@ app.post('/api/verify-payment', (req, res) => {
   }
 });
 
+function isProRequest(req) {
+  const cookies = parseCookies(req);
+  const raw = cookies[PRO_COOKIE_NAME];
+  if (!raw) return false;
+  const [paymentId, sig] = raw.split('.');
+  if (!paymentId || !sig) return false;
+  const expected = crypto
+    .createHmac('sha256', OWNER_KEY || 'fallback-secret-change-me')
+    .update(`pro.${paymentId}`)
+    .digest('hex');
+  const a = Buffer.from(sig);
+  const b = Buffer.from(expected);
+  if (a.length !== b.length) return false;
+  return crypto.timingSafeEqual(a, b);
+}
+
 // ─── Generate Prompts ────────────────────────────────────────────────────────
 app.post('/api/generate', async (req, res) => {
   try {
+    const owner = isOwnerRequest(req) || isProRequest(req);
+
+    if (!owner) {
+      const used = getFreeUsage(req);
+      if (used >= FREE_LIMIT) {
+        return res.status(403).json({
+          error: 'free_limit_reached',
+          message: 'Aapke 3 free prompts khatam ho gaye. Pro mein upgrade karo unlimited prompts ke liye.',
+          used,
+          limit: FREE_LIMIT,
+        });
+      }
+    }
+
     const { biz, city, lang, prob, category, outputTypes } = req.body;
 
     if (!biz) return res.status(400).json({ error: 'Business type required' });
@@ -308,6 +413,7 @@ Rules:
       return res.status(500).json({ error: 'Invalid AI response format. Please try again.' });
     }
 
+    if (!owner) incrementFreeUsage(req, res);
     res.json(parsed);
 
   } catch (err) {
