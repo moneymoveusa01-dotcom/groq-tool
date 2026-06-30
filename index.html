@@ -1,5 +1,6 @@
 
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -501,7 +502,7 @@ footer a:hover { color: #00d4aa; }
 
 <!-- Progress Bar -->
 <div class="progress-bar-wrap" id="progressWrap">
-  <span>Free prompts used today</span>
+  <span>Free prompts used</span>
   <span class="used-count" id="usedCount">0 / 3 free prompts used</span>
 </div>
 <div class="progress-track">
@@ -644,21 +645,34 @@ async function checkOwnerStatus() {
 }
 checkOwnerStatus();
 
-// ── Usage Tracking ──────────────────────────────────────────────────────────
+// ── Usage Tracking (Lifetime — 3 free prompts total, server-enforced) ───────
+// Ab koi localStorage nahi — yeh sirf cosmetic display ke liye hai.
+// Actual enforcement hamesha server (/api/generate) pe hota hai via signed
+// httpOnly cookie + IP tracking, isliye localStorage clear karke ya devtools
+// se bypass nahi ho sakta.
 const FREE_LIMIT = 3;
+let serverUsed = 0; // server se aaya hua actual count
+
+async function refreshUsage() {
+  try {
+    const res = await fetch('/api/usage-status');
+    const data = await res.json();
+    if (data.isOwner) {
+      isOwner = true;
+      isPro = true;
+    } else {
+      serverUsed = data.used || 0;
+    }
+    updateProgressBar();
+  } catch (e) {
+    // server unreachable — fail-safe: progress bar bas 0 dikhayega,
+    // lekin generate call hamesha server pe hi verify hota hai
+  }
+}
+refreshUsage();
 
 function getUsage() {
-  const today = new Date().toDateString();
-  const stored = JSON.parse(localStorage.getItem('promptkit_usage') || '{}');
-  if (stored.date !== today) return 0;
-  return stored.count || 0;
-}
-
-function incrementUsage() {
-  const today = new Date().toDateString();
-  const count = getUsage() + 1;
-  localStorage.setItem('promptkit_usage', JSON.stringify({ date: today, count }));
-  updateProgressBar();
+  return serverUsed;
 }
 
 function updateProgressBar() {
@@ -700,7 +714,7 @@ async function generate() {
     return;
   }
 
-  // Paywall check — skip if Pro
+  // Paywall pre-check — sirf UX ke liye (turant feedback), real check server pe hota hai
   if (!isPro && getUsage() >= FREE_LIMIT) {
     showPaywall();
     return;
@@ -717,12 +731,25 @@ async function generate() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ biz, city, lang, prob, category: cat })
     });
+
+    if (res.status === 403) {
+      // Server ne free limit reached bola — yahi asli source of truth hai
+      const data = await res.json().catch(() => ({}));
+      serverUsed = data.used ?? FREE_LIMIT;
+      updateProgressBar();
+      document.getElementById('formCard').style.display = 'block';
+      document.getElementById('loader').style.display = 'none';
+      document.getElementById('genBtn').disabled = false;
+      showPaywall();
+      return;
+    }
+
     if (!res.ok) throw new Error('Server error');
     const data = await res.json();
     if (data.error) throw new Error(data.error);
 
     allPrompts = data.prompts;
-    incrementUsage();
+    await refreshUsage(); // server ne increment kar diya, naya count le aao
     renderOutput(data);
   } catch(e) {
     document.getElementById('formCard').style.display = 'block';
